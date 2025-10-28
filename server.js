@@ -7,18 +7,25 @@ import Doctor from "./routes/doctor.js";
 import Appointment from "./routes/appointment.js";
 import Departments from "./routes/Departments.js";
 
-const app = express();
-app.use(express.json());
 dotenv.config();
-const PORT = process.env.PORT || 3000;
-connectDB();
+
+const app = express();
 app.use(cors());
+app.use(express.json());
+
+connectDB();
+
 app.use("/user", User);
 app.use("/doctors", Doctor);
 app.use("/appointments", Appointment);
 app.use("/departments", Departments);
 app.use("/uploads", express.static("uploads"));
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+app.get("/", (req, res) => {
+  res.send("Doctor Appointment Backend is running ");
 });
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+export default app;
