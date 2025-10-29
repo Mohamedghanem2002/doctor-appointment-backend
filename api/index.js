@@ -1,4 +1,3 @@
-import serverless from "serverless-http";
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -25,4 +24,4 @@ app.get("/", (req, res) => {
   res.send("Doctor Appointment Backend on Vercel ✅");
 });
 
-export const handler = serverless(app);
+export default app;
