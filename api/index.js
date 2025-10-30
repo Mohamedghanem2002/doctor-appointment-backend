@@ -20,6 +20,7 @@ async function initDB() {
 
 const app = express();
 
+// ✅ إعداد CORS الصحيح
 app.use(
   cors({
     origin: [
@@ -27,7 +28,7 @@ app.use(
       "http://localhost:5173",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
-    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -44,7 +45,7 @@ app.use("/appointments", Appointment);
 app.use("/departments", Departments);
 
 app.get("/", (req, res) => {
-  res.send("Doctor Appointment Backend on Vercel ✅");
+  res.json({ message: "Doctor Appointment Backend on Vercel ✅" });
 });
 
 export const handler = serverless(app);
