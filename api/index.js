@@ -20,17 +20,24 @@ async function initDB() {
 
 const app = express();
 
-// ✅ إعداد CORS الصحيح
-app.use(
-  cors({
-    origin: [
-      "https://doctor-appointment-frontend-red.vercel.app",
-      "http://localhost:5173",
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+// ✅ إعداد CORS المتوافق مع Vercel
+const allowedOrigins = [
+  "https://doctor-appointment-frontend-red.vercel.app",
+  "http://localhost:5173",
+];
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.setHeader("Access-Control-Allow-Origin", origin);
+  }
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+  next();
+});
 
 app.use(express.json());
 
