@@ -10,7 +10,6 @@ import Departments from "../routes/Departments.js";
 
 dotenv.config();
 
-// ✅ اتصال الداتا بيز يتم مرة واحدة فقط
 let isConnected = false;
 async function initDB() {
   if (!isConnected) {
@@ -20,10 +19,20 @@ async function initDB() {
 }
 
 const app = express();
-app.use(cors());
+
+app.use(
+  cors({
+    origin: [
+      "https://doctor-appointment-frontend-red.vercel.app",
+      "http://localhost:5173",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
-// ✅ تأكيد الاتصال قبل أي Route
 app.use(async (req, res, next) => {
   await initDB();
   next();
