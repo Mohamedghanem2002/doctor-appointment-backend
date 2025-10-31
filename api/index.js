@@ -19,25 +19,16 @@ async function initDB() {
 }
 
 const app = express();
-app.use(cors());
 
-// const allowedOrigins = [
-//   "https://doctor-appointment-frontend-red.vercel.app",
-//   "http://localhost:5173",
-// ];
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
-// app.use((req, res, next) => {
-//   const origin = req.headers.origin;
-//   if (allowedOrigins.includes(origin)) {
-//     res.setHeader("Access-Control-Allow-Origin", origin);
-//   }
-//   res.setHeader("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-//   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-//   if (req.method === "OPTIONS") {
-//     return res.status(200).end();
-//   }
-//   next();
-// });
+app.options("*", cors());
 
 app.use(express.json());
 
@@ -57,3 +48,5 @@ app.get("/", (req, res) => {
 
 export const handler = serverless(app);
 export default app;
+
+/////////////////
