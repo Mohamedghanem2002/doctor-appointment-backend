@@ -13,11 +13,15 @@ const upload = multer({ storage });
 router.post("/addDoctors", upload.single("image"), async (req, res) => {
   try {
     const { name, specialty, description, experienceYears } = req.body;
-
     if (!name || !specialty || !description || !experienceYears)
       return res.status(400).json({ message: "All fields are required" });
 
+    if (req.file && !req.file.mimetype.startsWith("image/"))
+      return res.status(400).json({ message: "Only image files are allowed" });
+
     let imageUrl = "";
+    let imageId = "";
+
     if (req.file) {
       const uploadResult = await new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(
@@ -29,7 +33,9 @@ router.post("/addDoctors", upload.single("image"), async (req, res) => {
         );
         Readable.from(req.file.buffer).pipe(stream);
       });
+
       imageUrl = uploadResult.secure_url;
+      imageId = uploadResult.public_id;
     }
 
     const newDoctor = new Doctor({
@@ -38,6 +44,7 @@ router.post("/addDoctors", upload.single("image"), async (req, res) => {
       description,
       experienceYears,
       image: imageUrl,
+      imageId,
     });
 
     const savedDoctor = await newDoctor.save();
@@ -49,8 +56,13 @@ router.post("/addDoctors", upload.single("image"), async (req, res) => {
 });
 
 router.get("/allDoctors", async (req, res) => {
-  const doctors = await Doctor.find();
-  res.json(doctors);
+  try {
+    const doctors = await Doctor.find();
+    res.json(doctors);
+  } catch (error) {
+    console.error("Error fetching doctors:", error);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 router.get("/count", async (req, res) => {
@@ -63,15 +75,24 @@ router.get("/count", async (req, res) => {
 });
 
 router.get("/:id", async (req, res) => {
-  const doctor = await Doctor.findById(req.params.id);
-  if (!doctor) return res.status(404).json({ message: "Doctor not found" });
-  res.json(doctor);
+  try {
+    const doctor = await Doctor.findById(req.params.id);
+    if (!doctor) return res.status(404).json({ message: "Doctor not found" });
+    res.json(doctor);
+  } catch (error) {
+    console.error("Error fetching doctor:", error);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 router.delete("/:id", auth("admin"), async (req, res) => {
   try {
     const doctor = await Doctor.findById(req.params.id);
     if (!doctor) return res.status(404).json({ message: "Doctor not found" });
+
+    if (doctor.imageId) {
+      await cloudinary.uploader.destroy(doctor.imageId);
+    }
 
     await Doctor.findByIdAndDelete(req.params.id);
     res.json({ message: "Doctor deleted successfully" });
