@@ -6,18 +6,25 @@ const router = express.Router();
 
 // Create appointment
 router.post("/createAppointment", auth(), async (req, res) => {
-  const { doctor, date, reason } = req.body;
+  const { doctor, date, time, reason } = req.body;
 
-  if (!doctor || !date || !reason)
+  if (!doctor || !date || !time || !reason)
     return res.status(400).json({ message: "Missing fields" });
 
-  const appointment = await Appointment.create({
-    user: req.user.id,
-    doctor,
-    date,
-    reason,
-  });
-  res.status(201).json(appointment);
+  try {
+    const appointment = await Appointment.create({
+      user: req.user.id,
+      doctor,
+      date,
+      time,
+      reason,
+    });
+
+    res.status(201).json(appointment);
+  } catch (error) {
+    console.error("Error creating appointment:", error);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 // ✅ Fixed version
