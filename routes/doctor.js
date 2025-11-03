@@ -49,8 +49,12 @@ router.post("/addDoctors", upload.single("image"), async (req, res) => {
 });
 
 router.get("/allDoctors", async (req, res) => {
-  const doctors = await Doctor.find();
-  res.json(doctors);
+  try {
+    const doctors = await Doctor.find();
+    res.json(doctors);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching doctors" });
+  }
 });
 
 router.get("/count", async (req, res) => {
@@ -62,10 +66,29 @@ router.get("/count", async (req, res) => {
   }
 });
 
+router.get("/bySpecialty/:specialty", async (req, res) => {
+  try {
+    const { specialty } = req.params;
+
+    const doctors = await Doctor.find({
+      specialty: { $regex: new RegExp(specialty, "i") },
+    });
+
+    res.json(doctors);
+  } catch (error) {
+    console.error("Error fetching doctors by specialty:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 router.get("/:id", async (req, res) => {
-  const doctor = await Doctor.findById(req.params.id);
-  if (!doctor) return res.status(404).json({ message: "Doctor not found" });
-  res.json(doctor);
+  try {
+    const doctor = await Doctor.findById(req.params.id);
+    if (!doctor) return res.status(404).json({ message: "Doctor not found" });
+    res.json(doctor);
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching doctor" });
+  }
 });
 
 router.delete("/:id", auth("admin"), async (req, res) => {
