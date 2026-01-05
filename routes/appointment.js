@@ -4,6 +4,16 @@ import auth from "../auth/Middleware.js";
 
 const router = express.Router();
 
+// Get Appointment Count
+router.get("/count", async (req, res) => {
+  try {
+    const count = await Appointment.countDocuments();
+    res.json({ count });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching appointment count" });
+  }
+});
+
 // Create appointment
 router.post("/createAppointment", auth(), async (req, res) => {
   const { doctor, date, time, reason } = req.body;

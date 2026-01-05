@@ -4,6 +4,17 @@ import User from "../models/UserSchema.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
+// Get User Count
+router.get("/count", async (req, res) => {
+  try {
+    const count = await User.countDocuments({ role: "user" });
+    res.json({ count });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching user count" });
+  }
+});
+
+
 // Register Route
 router.post("/register", async (req, res) => {
   const { name, email, password, role = "user" } = req.body;

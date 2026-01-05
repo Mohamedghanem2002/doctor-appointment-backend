@@ -9,7 +9,7 @@ const router = express.Router();
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-router.post("/addDoctors", upload.single("image"), async (req, res) => {
+router.post("/addDoctors", auth("admin"), upload.single("image"), async (req, res) => {
   try {
     const { name, specialty, description, experienceYears } = req.body;
 
