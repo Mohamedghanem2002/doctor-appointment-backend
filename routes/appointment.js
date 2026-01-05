@@ -41,7 +41,7 @@ router.get("/myAppointments", auth(), async (req, res) => {
 });
 
 // Optional: Delete appointment by ID
-router.delete("/deleteAppointment/:id", async (req, res) => {
+router.delete("/deleteAppointment/:id", auth(), async (req, res) => {
   try {
     const { id } = req.params;
     const appointment = await Appointment.findByIdAndDelete(id);
