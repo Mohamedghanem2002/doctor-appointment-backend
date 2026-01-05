@@ -19,6 +19,12 @@ const UderSchema = new mongoose.Schema({
     type: String,
     default: "user",
   },
+  phone: {
+    type: String,
+  },
+  image: {
+    type: String,
+  },
 });
 
 const User = mongoose.model("User", UderSchema);

@@ -88,4 +88,32 @@ router.post("/signin", async (req, res) => {
   });
 });
 
+// Update User Route
+router.put("/updateUser/:id", async (req, res) => {
+  const { id } = req.params;
+  const { name, email, phone, image } = req.body;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      id,
+      { name, email, phone, image },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const { password: userPassword, ...rest } = updatedUser._doc;
+
+    return res.status(200).json({
+      message: "User updated successfully",
+      data: rest,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ message: "Error updating user" });
+  }
+});
+
 export default router;
